@@ -40,9 +40,9 @@ Certains dossiers contiennent des fichiers nécessaires au fonctionnement du pip
   - Contient les bases de données de noms utilisées pour le remplacement des entités détectées. Ce fichier est chargé automatiquement dans le pipeline
   - Ces fichiers servent au remplacement automatique des entités et ne nécessitent pas de modification directe.**Modifiez si nécessaire**
 
-### **3. Autres dossiers et fichiers**
-- **Dossiers temporaires ou intermédiaires** :
-  - Si le pipeline génère des fichiers ou dossiers temporaires (par exemple, pour des modèles ou des résultats), ils seront nommés explicitement.
+### **3. Dossier Résultant**
+- **`output.csv`** :
+  - le pipeline génère ce fichier à la sortie.
   - Vous pouvez les supprimer après exécution si vous ne souhaitez pas conserver les sorties.
 
 ---
@@ -89,23 +89,28 @@ pip install transformers pyspark nltk tqdm numpy pandas deep-translator comet-ml
 
 
 ## Le Modèle
-***apply_model(model_packaged_v2, df, ner_pipeline, blacklist, name_database)***
+***apply_model(model_packaged_v2, df, ner_pipeline, blacklist, name_database, index = 'index', observation_value = 'observation_value', name = 'name')***
 
 - **model_packaged_v2** (function) : La fonction d'application.
 - **df** (pyspark df) : dataframe contenat les textes à anonymiser(voir spécificité plus bas).
 - **ner_pipeline** (objet Hugging face)** : Le modèle Bert utilisé pour le NER
 - **blacklist** (list de str) : Un identifiant unique pour chaque ligne.
 - **name_database** (list de str)** : Liste de noms de remplacements.
+- **`index`** (*str, optionnel*) : le nom de la colonne avec les index.
+- **`observation_value`** (*str, optionnel*) : le nom de la colonne avec les textes à anonymiser
+- **`name`** (*str, optionnel*) : le nom de la colonne avec les noms déjà connu présent dans le texte.
 
 ---
 
 
 ## Format des données d'entrée ***df***
-Le DataFrame PySpark d'entrée doit contenir les colonnes suivantes(correctement nommées):
+Le DataFrame PySpark d'entrée doit contenir les colonnes suivantes:
 
 - **index** (int) : Un identifiant unique pour chaque ligne.
 - **observation_value** (str) : Le texte d'entrée à anonymiser.
 - **name** (list de str, optionnel)** : Liste de noms déjà connu et associés à l'observation (facultatif).
+
+***le nom des colonnes peut être passé comme argument à apply_model()***
 
 ### Exemple de DataFrame d'entrée
 | index | observation_value                | name                |
@@ -116,6 +121,7 @@ Le DataFrame PySpark d'entrée doit contenir les colonnes suivantes(correctement
 
 Des colonnes supplémentaires peuvent être présentes, mais seules ces colonnes sont nécessaires pour le pipeline.
 
+Attention: Le modèle fonctionne au meilleur de sa capacité lorsque les textes dans observation_value sont des phrases complètes !!!
 ---
 
 
@@ -126,20 +132,20 @@ Des colonnes supplémentaires peuvent être présentes, mais seules ces colonnes
 ### 1. Charger les données
 ```python
 spark = SparkSession.builder.appName("NERPipeline").getOrCreate()
-df = spark.read.parquet("TestSet2.2")
+df = ... # changer pour vos données
 ```
 
 ### 2. Préparer le pipelineNER, la blackliste et la BD de noms
 ```python
 from transformers import AutoModelForTokenClassification, AutoTokenizer, pipeline
-loaded_model = AutoModelForTokenClassification.from_pretrained('Anonymisation/bert-large-NER')   # Chargez le modèle Bert
-loaded_tokenizer = AutoTokenizer.from_pretrained('Anonymisation/bert-large-NER')   # Chargez le Tokenizer
+loaded_model = AutoModelForTokenClassification.from_pretrained('bert-large-NER')   # Chargez le modèle Bert
+loaded_tokenizer = AutoTokenizer.from_pretrained('bert-large-NER')   # Chargez le Tokenizer
 ner_pipeline = pipeline("ner", model=loaded_model, tokenizer=loaded_tokenizer, aggregation_strategy="simple")   # Construire le ner_pipeline
 
-with open("Anonymisation/blacklist/blacklist.pkl", "rb") as file:  
+with open("blacklist/blacklist.pkl", "rb") as file:  
     blacklist = pickle.load(file)  # Chargez la liste noire
 
-name_database = load_name_database('Anonymisation/prenomBD/prenom_M_et_F.csv')  # Chargez les remplacements de noms
+name_database = load_name_database('prenomBD/prenom_M_et_F.csv')  # Chargez les remplacements de noms
 
 ```
 
@@ -151,7 +157,7 @@ apply_model(model_packaged_v2, df, ner_pipeline, blacklist, name_database)
 ---
 
 ### Résultats
-Le pipeline anonymise les entités sensibles dans le texte et les remplace par des pseudonymes issus d'une base de données. Il prend en charge des règles personnalisables pour le filtrage et le remplacement des noms, ce qui le rend adapté à diverses tâches d'anonymisation.
+Le pipeline anonymise les entitées sensibles dans le texte. Il produit un fichier output.csv
 
 ---
 
@@ -160,5 +166,4 @@ Ce projet utilise :
 - **Transformers** par Hugging Face pour le NER (https://huggingface.co/dslim/bert-large-NER).
 - **medical-wordlist** pour la construction de la blackliste (https://github.com/CodeSante/medical-wordlist)
 - **donneesquebec** pour la BD de noms Québécois(https://www.donneesquebec.ca/recherche/dataset/banque-de-prenoms-garcons)(https://www.donneesquebec.ca/recherche/dataset/banque-de-prenoms-filles)
-
 ---
