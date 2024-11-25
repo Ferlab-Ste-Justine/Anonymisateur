@@ -1,0 +1,2 @@
+le fichier est trop gros pour github, il se trouve:
+https://msss365-my.sharepoint.com/:u:/r/personal/alexandre_cantin_hsj_ssss_gouv_qc_ca/Documents/R%C3%A9seauNeuronale%20Anonymisation/bert-large-NER/model.safetensors?csf=1&web=1&e=sZO7xW
