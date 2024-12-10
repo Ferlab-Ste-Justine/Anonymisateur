@@ -32,6 +32,7 @@ Certains dossiers contiennent des fichiers nécessaires au fonctionnement du pip
 
 - **`Anonymisation/bert-large-NER/`** :
   - Contient les fichiers nécessaire au réseau neuronale pour le NER. Ce fichier est chargé automatiquement dans le pipeline. **NE pas modifiez**
+  - **À Modifiez** le fichier **bert-large-NER/model_safetensors.txt** doit être remplacer par le vrai fichier(trop lourd pour github) **bert-large-NER/model.safetensors**, disponible ici: https://msss365-my.sharepoint.com/:u:/r/personal/alexandre_cantin_hsj_ssss_gouv_qc_ca/Documents/R%C3%A9seauNeuronale%20Anonymisation/bert-large-NER/model.safetensors?csf=1&web=1&e=sZO7xW
 
 - **`Anonymisation/blacklist/`** :
   - Contient le fichier `blacklist.pkl`, Ce fichier est chargé automatiquement dans le pipeline. **Modifiez si nécessaire**
@@ -126,8 +127,9 @@ Attention: Le modèle fonctionne au meilleur de sa capacité lorsque les textes 
 
 
 ## Utilisation
-### 0. Charger les fonctions du Notebook(***model_packaged_v2***): 
+### 0. Charger les fonctions du Notebook(***model_packaged_v2***) et le model.safetensor: 
 **Traduction**, **Pipeline NER**, **Blacklist**, **Remplacement de noms**, **Packaging du modèle**, **Application du modèle** et **Chargement des données**
+Remplacer le fichier **bert-large-NER/model_safetensors.txt** par **bert-large-NER/model.safetensors** disponnible là: https://msss365-my.sharepoint.com/:u:/r/personal/alexandre_cantin_hsj_ssss_gouv_qc_ca/Documents/R%C3%A9seauNeuronale%20Anonymisation/bert-large-NER/model.safetensors?csf=1&web=1&e=sZO7xW
 
 ### 1. Charger les données
 ```python
