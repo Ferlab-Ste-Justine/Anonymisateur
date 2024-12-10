@@ -1,5 +1,5 @@
 
-# Pipeline de Reconnaissance d'Entités Nommées (NER) pour l'Anonymisation de Texte
+# PPPipeline de Reconnaissance d'Entités Nommées (NER) pour l'Anonymisation de Texte
 
 ## Vue d'ensemble
 Ce projet met en œuvre un pipeline de reconnaissance d'entités nommées (NER) pour l'anonymisation de texte, en utilisant des bibliothèques Python telles que `transformers`, `pyspark` et `nltk`. Il inclut des fonctionnalités de prétraitement des données, d'application de modèles NER, de filtrage par Blacklist et de remplacement de noms.
